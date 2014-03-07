@@ -6,7 +6,7 @@
 <title>A-440</title>
 
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-<link rel="icon" href="/favicon.ico" type="image/x-icon">
+ <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -20,150 +20,103 @@
   
 */
 
-$(document).ready(function(){	
+$(document).ready(function(){ 
 
-	var context;
-	var bufferLoader;
-	var buffers = ['assets/audio/440_short.ogg','assets/audio/220_short.ogg'];
-	_440 =  null;
-	_220 =  null;
+  var context;
+  var bufferLoader;
+  var playing = false;
 
-
-    //-----------------------------------------------
-    var finishedLoading = function (bufferList) {
-	  _440 = context.createBufferSource();
-	  _220 = context.createBufferSource();
-	  _440.buffer = bufferList[0];
-	  _220.buffer = bufferList[1];
-	   start_sound(  _440 , 0); 
-	   //start_sound(  _220 , 0); 
-	}
-
+  window.AudioContext = window.AudioContext || window.webkitAudioContext;
+  context = new AudioContext();
   
-    // ---------------------------------------------
-	var start_sound = function ( source, time ) {
-	    /**
-		 source is of type AudioBufferSourceNode 
-			https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html#AudioBufferSourceNode
-	    */
-	    //For this silly site we'll loop until it's stopped
+  var oscillator = context.createOscillator();
+  oscillator.connect(context.destination);
+  oscillator.frequency.value = 440;
+  oscillator.detune.value =  0;
+  oscillator.type = oscillator.SINE;
+  oscillator.start(0);
+  playing = true;
+
  
-	    source.loop = true;
-  	    source.connect(context.destination);
-  	    source.playing = true;	
-        //console.log(source)
- 	    source.start(0);
-	}
+  $('.play').hide();
 
 
-	var toggle = function(action,source){
+  $('.play,.stop').click( function() {
+     
+    $('.play,.stop').toggle();
 
-	  if(action == 'play') {
-		//There's got to be a better way than to instantiate this uhgain ...
-		bufferLoader = new BufferLoader(
-	    	context,
-	    	buffers,
-	    	//callback
-	    	finishedLoading
-		);
+    if(playing == true){
+       oscillator.stop(0);
+       playing = false;
+    }
+    else {
+      oscillator = context.createOscillator();
+      oscillator.connect(context.destination);
+      oscillator.frequency.value = 440;
+      oscillator.detune.value =  0;
+      oscillator.type = oscillator.SINE;
+      oscillator.start(0);
+      playing = true;
+    }
 
-	    bufferLoader.load();
-	  }
-	  else if (action == 'stop'){
-
-	  	source.playing = false;
-	  	source.stop(0);
-	   
-	  }
-
-	}
-
-    // ---------------------------------------------
-	window.AudioContext = window.AudioContext || window.webkitAudioContext;
-	context = new AudioContext();
-    //console.log( context );
-
-	bufferLoader = new BufferLoader(
-	    context,
-	    buffers,
-	    //callback
-	    finishedLoading
-	);
+  });
 
 
-	bufferLoader.load();
-	
-   	$('.play').hide();
-
-
-   	$('.play,.stop').click( function() {
-	  	 
-		$('.play,.stop').toggle();
-
-	  	if(_440.playing == true){
-	  		toggle('stop', _440, 0)
-	  	}
-	  	else {
-	  		toggle('play', _440, 0)
-	  	}
-	});
+}); //end document.ready(...)
 
 
 
-	  
-	
-
-});
+   
 
 </script>
 
 <style type="text/css">
 
-body  {
-	background-color: #fff
-}
+  body  {
+    background-color: #fff
+  }
 
-.play {
-	width: 600px;
-	height: 600px;
-	cursor: hand;
-	background-image: url('assets/img/play.png');
-	background-repeat: no-repeat;
-	background-size:contain;
+  .play {
+    width: 600px;
+    height: 600px;
+    cursor: hand;
+    background-image: url('assets/img/play.png');
+    background-repeat: no-repeat;
+    background-size:contain;
     background-position:center;
 
-}
+  }
 
-.stop {
-	width: 600px;
-	height: 600px;
-	cursor: hand;
-	background-image: url('assets/img/stop.png');
-	background-repeat: no-repeat;
-	background-size: contain;
-    background-position:center;
+ .stop {
+   width: 600px;
+   height: 600px;
+   cursor: hand;
+   background-image: url('assets/img/stop.png');
+   background-repeat: no-repeat;
+   background-size: contain;
+   background-position:center;
 
-}
+  }
 
-.canvas {
-        width: 100%;
-        height: auto;
-        bottom: 0px;
-        top: 0px;
-        left: 0;
-        position: absolute;
-    }
+  .canvas {
+    width: 100%;
+    height: auto;
+    bottom: 0px;
+    top: 0px;
+    left: 0;
+    position: absolute;
+  }
  
- .center {
-        font-family: 'Over the Rainbow';
-        font-size: 24em;
-        position: fixed;
-        border: 0px ridge gray;
-        top: 40%;
-        left: 60%;
-        margin-top: -200px;
-        margin-left: -400px;
-    }	
+  .center {
+    font-family: 'Over the Rainbow';
+    font-size: 24em;
+    position: fixed;
+    border: 0px ridge gray;
+    top: 40%;
+    left: 60%;
+    margin-top: -200px;
+    margin-left: -400px;
+  } 
 
 </style>
 
@@ -171,11 +124,10 @@ body  {
 
 <body>
 
-<div id="container" class="canvas">
-	<div class="play center"></div>
-
-	<div class="stop center"></div>
-</div>
+  <div id="container" class="canvas">
+    <div class="play center"></div>
+    <div class="stop center"></div>
+  </div>
 
 
 </body>
