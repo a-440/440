@@ -1,0 +1,196 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="Description" CONTENT="A simple page and site that plays a tone at 440 hz, also known as A 440">
+
+<title>A-440</title>
+
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script src="assets/js/buffer-loader.js"></script>
+<script src="assets/js/aToolTip-master/js/jquery.atooltip.min.js"></script>
+<link rel="stylesheet" type="text/css" href="assets/js/aToolTip-master/css/atooltip.css" />
+
+
+
+<script type="text/javascript">
+
+/*
+  Thanks to Boris @ http://www.html5rocks.com/en/tutorials/webaudio/intro/ !
+  
+*/
+
+$(document).ready(function(){ 
+
+	var context = null;
+	var oscillator = null;
+	var gain = null;
+	var playing = false;
+
+	window.AudioContext = window.AudioContext || window.webkitAudioContext;
+	context = new AudioContext();
+
+
+  $('#container,.center').click(function(e) {
+    var offset = $(this).offset();
+    
+    //console.log(e.clientX - offset.left);
+    //console.log(e.clientY - offset.top);
+
+    var frequency = e.clientX - offset.left;
+    var amp = e.clientY - offset.top;
+
+    if (playing) {
+      //dbl-click to stop
+      return;
+    }
+
+    gainNode = context.createGain();
+    gainNode.gain.value = 0.5; //initial value
+    gainNode.connect( context.destination );
+
+
+    oscillator = context.createOscillator();
+
+    oscillator.connect(gainNode);
+
+	oscillator.frequency.value = frequency/2;
+	oscillator.detune.value =  0;
+	oscillator.type = oscillator.SINE;
+	oscillator.start(0);
+	playing = true;
+	
+	//console.log( "Playing sine wave @" + frequency + "Hz" )
+
+  });
+
+
+
+
+      
+
+$('#container,.center').mousemove( function(e){
+
+	_gain = ( e.clientY );
+	//console.log( (Math.abs(_gain) * -1 )   );
+	if(oscillator){
+	  oscillator.frequency.value = e.pageX;
+	 
+	}
+});
+
+$('#container,.center').dblclick( function(e){
+	oscillator ? oscillator.stop(0) : null;
+    playing = false;
+    $('#b,#c').hide();
+    $('#a').show();
+
+});
+
+
+$('#b,#c').hide();
+
+$('#a').click( function() {
+
+	$(this).hide();
+	$('#b,#c').show();
+});
+
+
+
+}); //end document.ready(...)
+
+
+
+   
+
+</script>
+
+<style type="text/css">
+@import url(http://fonts.googleapis.com/css?family=Over+the+Rainbow);
+
+  body  {
+    background-color: #fff;
+    font-family: 'Over the Rainbow';
+    font-size: 2em;
+    text-align: center;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
+  }
+
+
+
+  .canvas {
+    width: 100%;
+    height: auto;
+    bottom: 0px;
+    top: 0px;
+    left: 0;
+    position: absolute;
+  }
+ 
+  .center {
+    font-family: 'Over the Rainbow';
+    font-size: 2em;
+    position: fixed;
+    border: 0px ridge gray;
+    top: 60%;
+    left: 55%;
+    margin-top: -200px;
+    margin-left: -400px;
+    cursor: inherit;
+
+  } 
+
+</style>
+
+</head>
+
+<body>
+
+<!--
+<svg  xmlns="http://www.w3.org/2000/svg">
+    <circle id="circle" cx="500" cy="200" r="10" fill="green" />
+</svg>
+
+
+<input type="range" id="freq" min="1" max="1000">
+-->
+
+
+<div class="canvas" id="container" style="width:100%;height:100%">
+  <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="smallGrid" width="8" height="8" patternUnits="userSpaceOnUse">
+        <path d="M 8 0 L 0 0 0 8" fill="none" stroke="gray" stroke-width="0.5"/>
+      </pattern>
+      <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+        <rect width="80" height="80" fill="url(#smallGrid)"/>
+        <path d="M 80 0 L 0 0 0 80" fill="none" stroke="gray" stroke-width="1"/>
+      </pattern>
+    </defs>
+
+    <rect width="100%" height="100%" fill="url(#grid)" />
+  </svg>
+
+
+</div>
+
+
+<div class="center">
+	<span id="a"> Click anywhere to start </span>
+	<span id="b"> Move your mouse </span><br />
+	<span id="c"> Double-click to shut up </span>
+</div>
+
+</body>
+</html>
