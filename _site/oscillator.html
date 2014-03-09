@@ -126,7 +126,7 @@ visualize = function() {
     var offset = HEIGHT - height - 1;
     var barWidth = WIDTH/times.length;
     drawContext.fillStyle = 'blue';
-    drawContext.fillRect(i * barWidth, offset, 1, 1);
+    drawContext.fillRect(i * barWidth, offset, 2, 2);
   }
   requestAnimFrame( visualize.bind() ) ;
 };
@@ -213,33 +213,21 @@ window.requestAnimFrame = (function(){
 
 <body>
 
-<!--
-<svg  xmlns="http://www.w3.org/2000/svg">
-    <circle id="circle" cx="500" cy="200" r="10" fill="green" />
-</svg>
 
-
-<input type="range" id="freq" min="1" max="1000">
-
-
-
+<div class="canvas" id="container" style="width:100%;height:100%">
   <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <pattern id="smallGrid" width="8" height="8" patternUnits="userSpaceOnUse">
-        <path d="M 8 0 L 0 0 0 8" fill="none" stroke="gray" stroke-width="0.5"/>
+        <path d="M 8 0 L 0 0 0 8" fill="none" stroke="#eaeaea" stroke-width="0.5"/>
       </pattern>
       <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
         <rect width="80" height="80" fill="url(#smallGrid)"/>
-        <path d="M 80 0 L 0 0 0 80" fill="none" stroke="gray" stroke-width="1"/>
+        <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#eaeaea" stroke-width="1"/>
       </pattern>
     </defs>
 
     <rect width="100%" height="100%" fill="url(#grid)" />
   </svg>
--->
-
-
-<div class="canvas" id="container" style="width:100%;height:100%">
 
 </div>
 
