@@ -8,27 +8,24 @@
 <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
-
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-
-<script src="assets/js/buffer-loader.js"></script>
-<script src="assets/js/aToolTip-master/js/jquery.atooltip.min.js"></script>
-<link rel="stylesheet" type="text/css" href="assets/js/aToolTip-master/css/atooltip.css" />
-
-
 
 <script type="text/javascript">
 
 /*
-  Thanks to Boris @ http://www.html5rocks.com/en/tutorials/webaudio/intro/ !
-  
+  Thanks to Boris @ http://www.html5rocks.com/en/tutorials/webaudio/intro/ !  
 */
 
 $(document).ready(function(){ 
 
+
+	var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false );
+
+
 	var context = null;
 	var oscillator = null;
 	var gain = null;
+	var analyser = null;
 	var playing = false;
 
 	window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -53,10 +50,13 @@ $(document).ready(function(){
     gainNode.gain.value = 0.5; //initial value
     gainNode.connect( context.destination );
 
+    analyser = context.createAnalyser();
+    analyser.fftSize = 1024;
+    analyser.smoothingTimeConstant = 0.9;
+    analyser.connect( context.destination );
 
     oscillator = context.createOscillator();
-
-    oscillator.connect(gainNode);
+    oscillator.connect( analyser ); //was gainNode
 
 	oscillator.frequency.value = frequency/2;
 	oscillator.detune.value =  0;
@@ -67,7 +67,11 @@ $(document).ready(function(){
 
 	$('#a').hide();
 	$('#b,#c').show();
-	//console.log( "Playing sine wave @" + frequency + "Hz" )
+
+
+	requestAnimFrame( visualize.bind() ) ;
+
+
 
   });
 
@@ -97,6 +101,48 @@ $('#container,.center').dblclick( function(e){
 
 $('#b,#c').hide();
 
+
+
+visualize = function() {
+  var canvas = $('#monitor');
+  canvas = document.querySelector('canvas');
+
+  //console.log(canvas.context);
+
+  var HEIGHT = '120';
+  var WIDTH  = '600'; 
+  canvas.width = WIDTH;
+  canvas.height = HEIGHT;
+  var drawContext = canvas.getContext('2d');
+
+  var times = new Uint8Array( analyser.frequencyBinCount );
+
+  analyser.getByteTimeDomainData(times);
+
+  for (var i = 0; i < times.length; i++) {
+    var value = times[i];
+    var percent = value / 256;
+    var height = HEIGHT * percent;
+    var offset = HEIGHT - height - 1;
+    var barWidth = WIDTH/times.length;
+    drawContext.fillStyle = 'blue';
+    drawContext.fillRect(i * barWidth, offset, 1, 1);
+  }
+  requestAnimFrame( visualize.bind() ) ;
+};
+
+
+
+window.requestAnimFrame = (function(){
+	return  window.requestAnimationFrame       || 
+  			window.webkitRequestAnimationFrame || 
+  			window.mozRequestAnimationFrame    || 
+  			window.oRequestAnimationFrame      || 
+  			window.msRequestAnimationFrame     || 
+  	function( callback ){
+  		window.setTimeout(callback, 1000 / 60);
+	};
+})();
 
 
 
@@ -141,13 +187,25 @@ $('#b,#c').hide();
     font-size: 2em;
     position: fixed;
     border: 0px ridge gray;
-    top: 60%;
+    top: 50%;
     left: 55%;
     margin-top: -200px;
     margin-left: -400px;
     cursor: inherit;
 
   } 
+
+  #monitor {
+    position: fixed;
+    border: 0px dotted gray;
+    top: 90%;
+    left: 56%;
+    margin-top: -200px;
+    margin-left: -400px;
+    cursor: inherit;
+    z-index: -1;
+
+  }
 
 </style>
 
@@ -162,10 +220,9 @@ $('#b,#c').hide();
 
 
 <input type="range" id="freq" min="1" max="1000">
--->
 
 
-<div class="canvas" id="container" style="width:100%;height:100%">
+
   <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <pattern id="smallGrid" width="8" height="8" patternUnits="userSpaceOnUse">
@@ -179,7 +236,10 @@ $('#b,#c').hide();
 
     <rect width="100%" height="100%" fill="url(#grid)" />
   </svg>
+-->
 
+
+<div class="canvas" id="container" style="width:100%;height:100%">
 
 </div>
 
@@ -189,6 +249,8 @@ $('#b,#c').hide();
 	<span id="b"> Move your mouse </span><br />
 	<span id="c"> Double-click to shut up </span>
 </div>
+
+<canvas id="monitor" />
 
 </body>
 </html>
