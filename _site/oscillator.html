@@ -64,6 +64,9 @@ $(document).ready(function(){
 	oscillator.start(0);
 	playing = true;
 	
+
+	$('#a').hide();
+	$('#b,#c').show();
 	//console.log( "Playing sine wave @" + frequency + "Hz" )
 
   });
@@ -94,11 +97,6 @@ $('#container,.center').dblclick( function(e){
 
 $('#b,#c').hide();
 
-$('#container').click( function() {
-
-	$('#a').hide();
-	$('#b,#c').show();
-});
 
 
 
